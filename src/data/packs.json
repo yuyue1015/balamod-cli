@@ -1,0 +1,8 @@
+[
+  {
+    "id": "starter-pack",
+    "name": "Starter Pack",
+    "owner": "yuyue1015",
+    "mods": ["example-mod"]
+  }
+]

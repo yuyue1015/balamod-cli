@@ -1,0 +1,14 @@
+{
+  "name": "balamod-cli",
+  "version": "0.1.0",
+  "description": "Controlled Balatro mod CLI",
+  "main": "src/index.js",
+  "bin": {
+    "balamod": "bin/balamod.js"
+  },
+  "scripts": {
+    "check": "node --check bin/balamod.js && for f in $(rg --files src -g '*.js'); do node --check \"$f\"; done",
+    "test:smoke": "node scripts/smoke-test.js"
+  },
+  "license": "MIT"
+}
