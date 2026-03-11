@@ -1,4 +1,4 @@
-const { RegistryReader } = require('../registry/registry-reader');
+const { RegistryReader, CONTROLLED_REGISTRY_REPO } = require('../registry/registry-reader');
 
 class ControlledInstaller {
   constructor(registryDir) {
@@ -15,21 +15,30 @@ class ControlledInstaller {
     return {
       type: 'mod',
       id: mod.id,
+      source: CONTROLLED_REGISTRY_REPO,
       status: 'planned',
       note: '第一版仅生成受控安装计划，不执行 shell 安装命令。',
     };
   }
 
   async installPack(packId) {
-    const packs = await this.reader.readPacks();
+    const [mods, packs] = await Promise.all([this.reader.readMods(), this.reader.readPacks()]);
     const pack = packs.find((item) => item.id === packId);
     if (!pack) {
       throw new Error(`禁止安装 registry 外 pack: ${packId}`);
     }
 
+    const modSet = new Set(mods.map((item) => item.id));
+    const missing = pack.mods.filter((modId) => !modSet.has(modId));
+    if (missing.length > 0) {
+      throw new Error(`pack(${pack.id}) 引用了 registry 中不存在的 mod: ${missing.join(', ')}`);
+    }
+
     return {
       type: 'pack',
       id: pack.id,
+      source: CONTROLLED_REGISTRY_REPO,
+      mods: pack.mods,
       status: 'planned',
       note: '第一版仅生成受控安装计划，不执行 shell 安装命令。',
     };
